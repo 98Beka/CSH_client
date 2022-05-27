@@ -39,7 +39,7 @@ namespace CsharpPool.Assets.Scripts {
             oprtr.Telegram = userTelegram.text;
             var json = JsonConvert.SerializeObject(oprtr);
             var data = new StringContent(json, Encoding.UTF8, "application/json");
-            await StaticDatas.Client.PostAsync("/changeUserData", data);
+            await StaticDatas.Client.PostAsync("/changeOperatorData", data);
         }
 
         private IEnumerator OffThanOn( GameObject gObj) {

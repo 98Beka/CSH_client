@@ -24,19 +24,22 @@ namespace CsharpPool.Assets.Scripts {
         }
 
         public async void CreatOrSingIn(InputField nickName) {
-            StaticDatas.MainOperator = await GetOperatorFromDB(nickName.text.ToLower());
-            if(StaticDatas.MainOperator != null) {
-                singInPanel.SetActive(true);
-                createAccountPanel.SetActive(false);
-            } else {
+            var res = await GetOperatorFromDB(nickName.text.ToLower());
+            if(res == null) {
                 StaticDatas.MainOperator.Nickname = nickName.text;
                 createAccountPanel.SetActive(true);
                 singInPanel.SetActive(false);
+            } else {
+                StaticDatas.MainOperator = res;
+                singInPanel.SetActive(true);
+                createAccountPanel.SetActive(false);
             }
         }
 
+
+        //Get operator from database
         private async Task<Operator> GetOperatorFromDB(string nickName) {
-            var result = await StaticDatas.Client.PostAsync("/getOperator", new StringContent(nickName)); 
+            var result = await StaticDatas.Client.GetAsync($"/getOperator/{nickName}"); 
             string resString = await result.Content.ReadAsStringAsync();
             if (resString == "null")
                 return null;
@@ -56,7 +59,7 @@ namespace CsharpPool.Assets.Scripts {
                 StaticDatas.MainOperator.Password = firstPasswordUI.text;
                 var json = JsonConvert.SerializeObject(StaticDatas.MainOperator);
                 var data = new StringContent(json, Encoding.UTF8, "application/json");
-                await StaticDatas.Client.PostAsync("/addUser", data);
+                await StaticDatas.Client.PostAsync("/sendOperator", data);
                 menuController.OpenMainCanvas();
             } else {
                 StartCoroutine(WaitAndCloseMessege("pawords aren't the same"));
